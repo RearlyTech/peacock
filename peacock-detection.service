@@ -1,0 +1,13 @@
+[Unit]
+Description=Peacock Detection Service
+After=network.target
+
+[Service]
+ExecStart=/home/orangepi/run_peacock_detection.sh
+Restart=always
+User=orangepi
+Group=orangepi
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=multi-user.target
