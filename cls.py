@@ -4,6 +4,25 @@ from ultralytics import YOLO
 import sys
 import os
 from contextlib import contextmanager
+import time
+import threading
+import subprocess
+
+# GPIO control functions
+def set_gpio_mode(pin, mode):
+    subprocess.run(["gpio", "mode", str(pin), mode])
+
+def write_gpio(pin, value):
+    subprocess.run(["gpio", "write", str(pin), str(value)])
+
+# Function to blink the LED for 5 seconds
+def blink_led(pin, duration=5):
+    end_time = time.time() + duration
+    while time.time() < end_time:
+        write_gpio(pin, 1)  # Turn LED on
+        time.sleep(0.1)     # 100 ms delay
+        write_gpio(pin, 0)  # Turn LED off
+        time.sleep(0.1)     # 100 ms delay
 
 @contextmanager
 def suppress_stdout_stderr():
@@ -12,7 +31,7 @@ def suppress_stdout_stderr():
         old_stderr = sys.stderr
         sys.stdout = devnull
         sys.stderr = devnull
-        try:  
+        try:
             yield
         finally:
             sys.stdout = old_stdout
@@ -36,6 +55,9 @@ def run_webcam_classification():
 
     # Define peacock-related classes (you may need to adjust these based on the actual ImageNet classes)
     peacock_classes = ['peacock', 'peafowl']
+
+    # Set GPIO pin 2 mode to output
+    set_gpio_mode(2, "out")
 
     while True:
         # Read a frame from the webcam
@@ -62,6 +84,9 @@ def run_webcam_classification():
             text = f"PEACOCK DETECTED: {class_name} ({top_prob:.2f})"
             cv2.putText(display_frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             print(text)  # This is the only print statement that should appear
+
+            # Start the LED blinking in a separate thread for 5 seconds
+            threading.Thread(target=blink_led, args=(2, 5)).start()
 
         # Display the frame
         cv2.imshow("YOLOv8-cls Inference", display_frame)
