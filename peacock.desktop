@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/python3 /home/orangepi/peacock/gui-peacock.py
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Peacock Detector
+Name=Peacock Detector
+Comment[en_US]=Starts the Peacock Detector application
+Comment=Starts the Peacock Detector application
